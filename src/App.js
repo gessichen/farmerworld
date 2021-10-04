@@ -54,7 +54,7 @@ function App() {
 
       if(wax && wax.userAccount && timenow > res.data.rows[0].next_availability) {
 
-        console.log('claiming tool: ' + tools[0].asset_id);
+        console.log('claiming tool: ' + res.data.rows[0].asset_id);
 
         try {
           const result = await wax.api.transact({
@@ -66,7 +66,7 @@ function App() {
                 permission: 'active',
               }],
               data: {
-                asset_id: tools[0].asset_id,
+                asset_id: res.data.rows[0].asset_id,
                 owner: wax.userAccount
               },
             }]
