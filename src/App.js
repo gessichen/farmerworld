@@ -48,7 +48,7 @@ function App() {
         "show_payer": false
       });
 
-      console(res.data.rows);
+      console.log(res.data.rows);
       console.log(res.data.rows[0].next_availability);
       console.log(timenow);
 
