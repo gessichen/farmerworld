@@ -48,38 +48,42 @@ function App() {
         "show_payer": false
       });
 
-      console.log(res.data.rows);
-      console.log(res.data.rows[0].next_availability);
-      console.log(timenow);
+      if(wax && wax.userAccount) {
 
-      if(wax && wax.userAccount && timenow > res.data.rows[0].next_availability) {
+        const proms = [];
 
-        console.log('claiming tool: ' + res.data.rows[0].asset_id);
+        for(let r of res.data.rows) {
+          if(r.next_availability < timenow) {
 
-        try {
-          const result = await wax.api.transact({
-            actions: [{
-              account: 'farmersworld',
-              name: 'claim',
-              authorization: [{
-                actor: wax.userAccount,
-                permission: 'active',
-              }],
-              data: {
-                asset_id: res.data.rows[0].asset_id,
-                owner: wax.userAccount
-              },
-            }]
-          }, {
-            blocksBehind: 3,
-            expireSeconds: 1200,
-          });
-
-          console.log(result);
+            console.log('claiming tool: ' + r.asset_id);
+            
+            proms.push(wax.api.transact({
+              actions: [{
+                account: 'farmersworld',
+                name: 'claim',
+                authorization: [{
+                  actor: wax.userAccount,
+                  permission: 'active',
+                }],
+                data: {
+                  asset_id: r.asset_id,
+                  owner: wax.userAccount
+                },
+              }]
+            }, {
+              blocksBehind: 3,
+              expireSeconds: 1200,
+            }))
+          }
         }
-        catch (e) {
+
+        Promise.all(proms)
+        .then(() => {
+          console.log("done")
+        })
+        .catch((e) => {
           console.log(e);
-        }
+        })
       }
     }, 60000);
   }, [])
